@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Nordmadic Order Form</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #f7f7f7;
+    }
+    h2 { margin-top: 30px; }
+    .item-row {
+        background: #fff;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+    button {
+        padding: 10px 15px;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<h1>Nordmadic Order Form</h1>
+
+<h2>Customer Information</h2>
+<label>Name:</label><br>
+<input id="customerName" type="text" required><br><br>
+
+<label>Email:</label><br>
+<input id="customerEmail" type="email" required><br><br>
+
+<label>Phone Number:</label><br>
+<input id="customerPhone" type="text" required><br><br>
+
+<h2>Targeted Trip</h2>
+<select id="tripSelect">
+    <option value="Oslo ? Copenhagen">Oslo ? Copenhagen</option>
+    <option value="Oslo ? Stockholm">Oslo ? Stockholm</option>
+    <option value="Oslo ? London">Oslo ? London</option>
+    <option value="Custom">Custom</option>
+</select>
+
+<h2>Items</h2>
+<div id="itemsContainer"></div>
+
+<button onclick="addItem()">Add Item</button>
+
+<br><br>
+<button onclick="submitForm()">Submit Order</button>
+
+<script>
+let itemCount = 0;
+
+function addItem() {
+    itemCount++;
+    const container = document.getElementById("itemsContainer");
+
+    const div = document.createElement("div");
+    div.className = "item-row";
+    div.id = "item-" + itemCount;
+
+    div.innerHTML = `
+        <h3>Item ${itemCount}</h3>
+        <label>Item Name:</label><br>
+        <input type="text" class="item-name"><br><br>
+
+        <label>Quantity:</label><br>
+        <input type="number" class="item-qty" min="1" value="1"><br><br>
+
+        <label>Description:</label><br>
+        <textarea class="item-desc"></textarea><br><br>
+
+        <button onclick="removeItem('${div.id}')">Remove</button>
+    `;
+
+    container.appendChild(div);
+}
+
+function removeItem(id) {
+    document.getElementById(id).remove();
+}
+
+async function submitForm() {
+    const items = [];
+    document.querySelectorAll(".item-row").forEach(row => {
+        items.push({
+            name: row.querySelector(".item-name").value,
+            qty: row.querySelector(".item-qty").value,
+            desc: row.querySelector(".item-desc").value
+        });
+    });
+
+    const payload = {
+        customerName: document.getElementById("customerName").value,
+        customerEmail: document.getElementById("customerEmail").value,
+        customerPhone: document.getElementById("customerPhone").value,
+        trip: document.getElementById("tripSelect").value,
+        items: items
+    };
+
+    // TODO: Replace with your Google Apps Script Web App URL
+    const endpoint = "YOUR_GOOGLE_SCRIPT_URL_HERE";
+
+    const res = await fetch(endpoint, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify(payload)
+    });
+
+    alert("Order submitted!");
+}
+</script>
+
+</body>
+</html>
